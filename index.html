@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rescue Radar — Import history</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <h1>Rescue Radar</h1>
+      <p class="sub">Bring in past history</p>
+    </header>
+
+    <div id="loading" class="card">Checking your link…</div>
+
+    <div id="invalid" class="card error hidden">
+      <p id="invalid-message">This link is invalid.</p>
+      <p class="muted">Ask the app for a new one — Settings → Import history.</p>
+    </div>
+
+    <div id="app" class="hidden">
+      <p id="greeting" class="greeting"></p>
+
+      <div class="tabs">
+        <button id="tab-upload" class="tab active" type="button">Upload a file</button>
+        <button id="tab-form" class="tab" type="button">Fill in a form</button>
+      </div>
+
+      <section id="panel-upload" class="panel">
+        <p class="muted">Have a spreadsheet, CSV, or export from another app? Upload it here.</p>
+        <input id="file-input" type="file" accept=".csv,.xlsx,.xls,.pdf,.txt,image/*" />
+        <button id="upload-submit" class="primary" type="button">Send file</button>
+        <div id="upload-result" class="result"></div>
+      </section>
+
+      <section id="panel-form" class="panel hidden">
+        <p class="muted">No file? Fill in what you remember, day by day.</p>
+        <div id="rows"></div>
+        <button id="add-row" class="secondary" type="button">+ Add another day</button>
+        <button id="form-submit" class="primary" type="button">Submit</button>
+        <div id="form-result" class="result"></div>
+      </section>
+    </div>
+  </main>
+
+  <template id="row-template">
+    <div class="row" data-row>
+      <div class="row-head">
+        <input type="date" data-field="date" />
+        <button type="button" class="remove-row" data-remove>Remove</button>
+      </div>
+      <div class="field-group" data-field="meds"></div>
+      <label class="checkbox-inline">
+        <input type="checkbox" data-field="nmh" /> Headache day with no rescue medication taken
+      </label>
+      <div class="field-group" data-field="triggers"></div>
+      <textarea data-field="note" placeholder="Notes (optional)" rows="2"></textarea>
+      <div class="row-status" data-status></div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
