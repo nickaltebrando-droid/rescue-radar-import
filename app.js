@@ -13,9 +13,9 @@ const ERROR_MESSAGES = {
   bad_request: "Something about that request wasn't right.",
 };
 
-// Mirrors src/data/catalog.js's CANON_ORDER + CLASS_LABEL — hand-duplicated
-// here since this static page has no access to the app's source, same
-// convention already used for TRIGGERS in the Edge Functions.
+// Mirrors src/data/catalog.js's CANON_ORDER + EXTRA_CLASSES + CLASS_LABEL —
+// hand-duplicated here since this static page has no access to the app's
+// source, same convention already used for TRIGGERS in the Edge Functions.
 const MED_CLASSES = [
   ["NSAID", "NSAIDs"],
   ["Triptan", "Triptans"],
@@ -26,6 +26,7 @@ const MED_CLASSES = [
   ["Ditan", "Ditans"],
   ["Opioid", "Opioids"],
   ["Antiemetic", "Anti-nausea"],
+  ["Other", "Other"],
 ];
 
 function friendlyError(body) {
