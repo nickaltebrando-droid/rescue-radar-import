@@ -1,0 +1,3 @@
+# Supabase CLI local project-link cache (created if `supabase` commands are
+# ever run from this directory instead of the main rescue-radar repo)
+supabase/.temp/

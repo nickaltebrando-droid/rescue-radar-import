@@ -138,3 +138,34 @@ textarea {
 .row-status.ok { color: var(--ok); }
 .row-status.error { color: var(--brand-deep); }
 .row.done { opacity: 0.6; }
+
+.add-med {
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 14px;
+  background: var(--oat);
+}
+.add-med-row { display: flex; gap: 6px; margin-top: 8px; }
+.add-med-row input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.add-med-row select {
+  padding: 9px 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  font-size: 13px;
+  background: var(--card);
+}
+.add-med-row button {
+  width: auto;
+  margin-top: 0;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+.add-med .result { margin-top: 8px; font-size: 13px; }

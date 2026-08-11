@@ -13,6 +13,21 @@ const ERROR_MESSAGES = {
   bad_request: "Something about that request wasn't right.",
 };
 
+// Mirrors src/data/catalog.js's CANON_ORDER + CLASS_LABEL — hand-duplicated
+// here since this static page has no access to the app's source, same
+// convention already used for TRIGGERS in the Edge Functions.
+const MED_CLASSES = [
+  ["NSAID", "NSAIDs"],
+  ["Triptan", "Triptans"],
+  ["Gepant", "Gepants"],
+  ["Ergot", "Ergots"],
+  ["Combination", "Combination"],
+  ["Analgesic", "Analgesics"],
+  ["Ditan", "Ditans"],
+  ["Opioid", "Opioids"],
+  ["Antiemetic", "Anti-nausea"],
+];
+
 function friendlyError(body) {
   if (!body) return "Something went wrong.";
   return ERROR_MESSAGES[body.error] || body.message || body.error || "Something went wrong.";
@@ -35,6 +50,10 @@ const els = {
   uploadResult: document.getElementById("upload-result"),
   rows: document.getElementById("rows"),
   addRow: document.getElementById("add-row"),
+  newMedName: document.getElementById("new-med-name"),
+  newMedCls: document.getElementById("new-med-cls"),
+  addMedSubmit: document.getElementById("add-med-submit"),
+  addMedResult: document.getElementById("add-med-result"),
   formSubmit: document.getElementById("form-submit"),
   formResult: document.getElementById("form-result"),
   rowTemplate: document.getElementById("row-template"),
@@ -71,6 +90,14 @@ async function init() {
     : "Importing history.";
   els.loading.classList.add("hidden");
   els.app.classList.remove("hidden");
+
+  MED_CLASSES.forEach(([cls, label]) => {
+    const opt = document.createElement("option");
+    opt.value = cls;
+    opt.textContent = label;
+    els.newMedCls.appendChild(opt);
+  });
+
   addRow();
 }
 
@@ -149,6 +176,44 @@ function addRow() {
   els.rows.appendChild(row);
 }
 els.addRow.addEventListener("click", addRow);
+
+// Creates the medication immediately (a separate request, before any day
+// entries reference it) so entries only ever need to point at real ids —
+// avoids the complexity of resolving a not-yet-created medication's id
+// inside the same submission that also saves day entries. Only applies to
+// rows added *after* this point via addRow(); already-open rows don't
+// retroactively grow a checkbox for it — a deliberate, small scope call
+// (add your medications before filling in days, or just add another row).
+els.addMedSubmit.addEventListener("click", async () => {
+  const name = els.newMedName.value.trim();
+  const cls = els.newMedCls.value;
+  if (!name) {
+    els.addMedResult.textContent = "Enter a medication name first.";
+    els.addMedResult.className = "result error";
+    return;
+  }
+  els.addMedSubmit.disabled = true;
+  els.addMedResult.textContent = "Adding…";
+  els.addMedResult.className = "result";
+  try {
+    const res = await fetch(BULK_ENTRY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, newMedication: { name, cls } }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(friendlyError(body));
+    context.medications = [...(context.medications || []), body.medication];
+    els.newMedName.value = "";
+    els.addMedResult.textContent = `Added "${name}" — it'll show up on new day rows.`;
+    els.addMedResult.className = "result ok";
+  } catch (e) {
+    els.addMedResult.textContent = e.message || "Couldn't add that medication.";
+    els.addMedResult.className = "result error";
+  } finally {
+    els.addMedSubmit.disabled = false;
+  }
+});
 
 function readRow(rowEl) {
   const date = rowEl.querySelector('[data-field="date"]').value;

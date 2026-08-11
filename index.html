@@ -37,6 +37,17 @@
 
       <section id="panel-form" class="panel hidden">
         <p class="muted">No file? Fill in what you remember, day by day.</p>
+
+        <div class="add-med">
+          <p class="muted">Taking something that's not in the list below? Add it here first — it'll show up as a checkbox for every day after that.</p>
+          <div class="add-med-row">
+            <input id="new-med-name" type="text" placeholder="Medication name" />
+            <select id="new-med-cls"></select>
+            <button id="add-med-submit" class="secondary" type="button">Add</button>
+          </div>
+          <div id="add-med-result" class="result"></div>
+        </div>
+
         <div id="rows"></div>
         <button id="add-row" class="secondary" type="button">+ Add another day</button>
         <button id="form-submit" class="primary" type="button">Submit</button>
