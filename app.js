@@ -127,11 +127,20 @@ els.uploadSubmit.addEventListener("click", async () => {
   els.uploadSubmit.disabled = true;
   els.uploadResult.textContent = "Uploading…";
   els.uploadResult.className = "result";
+  // The server responds as soon as the file is safely stored — it no
+  // longer waits for AI parsing to finish before replying (that used to
+  // hold this connection open for a minute+ on a big file, and on a flaky
+  // connection the response sometimes never made it back even though the
+  // upload itself had actually succeeded). This timeout is just a backstop
+  // for a genuinely stuck connection during the upload itself, so this
+  // never sits on "Uploading…" forever with no result either way.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 60_000);
   try {
     const form = new FormData();
     form.append("token", token);
     form.append("file", file);
-    const res = await fetch(UPLOAD_URL, { method: "POST", body: form });
+    const res = await fetch(UPLOAD_URL, { method: "POST", body: form, signal: controller.signal });
     const body = await res.json();
     if (!res.ok) throw new Error(friendlyError(body));
     els.uploadResult.textContent = "Got it — you'll see it waiting for review next time you open the app.";
@@ -139,9 +148,11 @@ els.uploadSubmit.addEventListener("click", async () => {
     els.fileInput.disabled = true;
     els.uploadSubmit.disabled = true;
   } catch (e) {
-    els.uploadResult.textContent = e.message || "Upload failed.";
+    els.uploadResult.textContent = e.name === "AbortError" ? "Upload timed out — check your connection and try again." : e.message || "Upload failed.";
     els.uploadResult.className = "result error";
     els.uploadSubmit.disabled = false;
+  } finally {
+    clearTimeout(timeout);
   }
 });
 
